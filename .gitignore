@@ -38,11 +38,11 @@ venv.bak/
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 
-# Vector DB & Local Storage / Databases
-chroma_db/
-.chroma/
-*.sqlite3
-*.db
+# # Vector DB & Local Storage / Databases
+# chroma_db/
+# .chroma/
+# *.sqlite3
+# *.db
 
 # IDE & Editor Settings
 .vscode/
