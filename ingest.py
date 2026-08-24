@@ -1,7 +1,12 @@
 import os
+import sys
 import glob
 import chromadb
 from dotenv import load_dotenv
+
+# Ensure UTF-8 output encoding for Windows terminal compatibility
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 # Load environment variables
 load_dotenv()
@@ -38,7 +43,6 @@ def load_documents(data_dir: str = "data") -> list[dict]:
     """
     all_chunks = []
     
-    # Map file basenames to clean source names
     file_source_map = {
         "company_hr_policy.txt": "HR Policy",
         "engineering_standards.txt": "Engineering",
@@ -48,13 +52,13 @@ def load_documents(data_dir: str = "data") -> list[dict]:
     }
 
     if not os.path.exists(data_dir):
-        data_dir = "."  # fallback to current directory if data folder not found
+        data_dir = "."  # fallback to current directory
 
     txt_files = glob.glob(os.path.join(data_dir, "*.txt"))
     if not txt_files:
         raise FileNotFoundError(f"No .txt documents found in '{data_dir}' directory.")
 
-    print(f"📁 Loading {len(txt_files)} documents from '{data_dir}'...")
+    print(f"[*] Loading {len(txt_files)} documents from '{data_dir}'...")
 
     for file_path in txt_files:
         filename = os.path.basename(file_path)
@@ -65,9 +69,9 @@ def load_documents(data_dir: str = "data") -> list[dict]:
 
         chunks = chunk_document(content, source_name)
         all_chunks.extend(chunks)
-        print(f"  ✓ Loaded '{filename}' as [{source_name}] ({len(chunks)} chunks)")
+        print(f"  + Loaded '{filename}' as [{source_name}] ({len(chunks)} chunks)")
 
-    print(f"📦 Total chunks created: {len(all_chunks)}")
+    print(f"[*] Total chunks created: {len(all_chunks)}")
     return all_chunks
 
 
@@ -77,7 +81,7 @@ def run_ingestion(db_path: str = "./chroma_db", collection_name: str = "company_
     """
     chunks = load_documents()
 
-    print(f"\n⚙️ Initializing Chroma persistent client at '{db_path}'...")
+    print(f"\n[*] Initializing Chroma persistent client at '{db_path}'...")
     chroma_client = chromadb.PersistentClient(path=db_path)
 
     # Re-create collection to prevent duplicate entries on re-runs
@@ -99,7 +103,7 @@ def run_ingestion(db_path: str = "./chroma_db", collection_name: str = "company_
         metadatas=metadatas
     )
 
-    print(f"✅ Successfully ingested {len(documents)} chunks into ChromaDB collection '{collection_name}'!")
+    print(f"[OK] Successfully ingested {len(documents)} chunks into ChromaDB collection '{collection_name}'!")
 
 
 if __name__ == "__main__":

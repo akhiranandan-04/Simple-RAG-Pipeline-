@@ -1,6 +1,11 @@
+import sys
 import time
 from dotenv import load_dotenv
 from query import ask_rag, rag_agent
+
+# Ensure UTF-8 output encoding for Windows terminal compatibility
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 load_dotenv()
 
@@ -41,7 +46,7 @@ TEST_SUITE = [
 
 def run_evaluation():
     print("=" * 70)
-    print("      🧪 Running RAG Pipeline Test Suite Evaluation")
+    print("      Running RAG Pipeline Test Suite Evaluation")
     print("=" * 70)
 
     total_tests = len(TEST_SUITE)
@@ -53,7 +58,7 @@ def run_evaluation():
         expected = test["expected_keywords"]
 
         print(f"\nTest {idx}/{total_tests} [{category}]")
-        print(f"❓ Question: {question}")
+        print(f"[?] Question: {question}")
 
         start_time = time.time()
         try:
@@ -66,16 +71,16 @@ def run_evaluation():
 
             if success:
                 passed_tests += 1
-                print(f"✅ PASSED ({elapsed:.2f}s) | Matched keywords: {matches}")
+                print(f"[OK] PASSED ({elapsed:.2f}s) | Matched keywords: {matches}")
             else:
-                print(f"❌ FAILED ({elapsed:.2f}s) | Expected any of: {expected}")
-                print(f"   Received Answer: {answer[:120]}...")
+                print(f"[X] FAILED ({elapsed:.2f}s) | Expected any of: {expected}")
+                print(f"    Received Answer: {answer[:120]}...")
 
         except Exception as e:
-            print(f"💥 ERROR executing test: {e}")
+            print(f"[!] ERROR executing test: {e}")
 
     print("\n" + "=" * 70)
-    print(f"📊 Evaluation Complete: {passed_tests}/{total_tests} tests passed ({(passed_tests/total_tests)*100:.1f}%)")
+    print(f"[*] Evaluation Complete: {passed_tests}/{total_tests} tests passed ({(passed_tests/total_tests)*100:.1f}%)")
     print("=" * 70)
 
 

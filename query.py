@@ -1,8 +1,13 @@
 import os
+import sys
 import chromadb
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+
+# Ensure UTF-8 output encoding for Windows terminal compatibility
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 # Load environment variables
 load_dotenv()
@@ -37,7 +42,7 @@ def get_chroma_collection(db_path: str = "./chroma_db", collection_name: str = "
         try:
             _chroma_collection = chroma_client.get_collection(name=collection_name)
         except Exception:
-            print("⚠️ Collection not found. Running ingestion first...")
+            print("[!] Collection not found. Running ingestion first...")
             from ingest import run_ingestion
             run_ingestion(db_path=db_path, collection_name=collection_name)
             _chroma_collection = chroma_client.get_collection(name=collection_name)
@@ -63,13 +68,13 @@ def ask_rag(question: str, n_results: int = 3, verbose: bool = True) -> str:
     chunks, sources = retrieve(question, n_results)
 
     if verbose:
-        print(f"\n{'═' * 60}")
-        print(f"❓ Question: {question}")
-        print(f"{'─' * 60}")
-        print(f"📄 Retrieved {len(chunks)} chunks:")
+        print(f"\n{'=' * 60}")
+        print(f"[?] Question: {question}")
+        print(f"{'-' * 60}")
+        print(f"[*] Retrieved {len(chunks)} chunks:")
         for chunk, source in zip(chunks, sources):
             print(f"   [{source['source']}] {chunk[:80]}...")
-        print(f"{'─' * 60}")
+        print(f"{'-' * 60}")
 
     context = "\n\n".join(chunks)
 
@@ -95,8 +100,8 @@ def ask_rag(question: str, n_results: int = 3, verbose: bool = True) -> str:
     answer = response.text
 
     if verbose:
-        print(f"💡 Answer: {answer}")
-        print(f"{'═' * 60}\n")
+        print(f"[>] Answer: {answer}")
+        print(f"{'=' * 60}\n")
 
     return answer
 
@@ -119,9 +124,9 @@ def rag_agent(question: str, verbose: bool = True) -> str:
     Agentic RAG function using Gemini Chat with Function Calling tool.
     """
     if verbose:
-        print(f"\n{'═' * 60}")
-        print(f"🧑 Question: {question}")
-        print(f"{'─' * 60}")
+        print(f"\n{'=' * 60}")
+        print(f"[?] Question: {question}")
+        print(f"{'-' * 60}")
 
     system_instruction = (
         "You are a helpful company assistant with access to internal documents "
@@ -146,13 +151,12 @@ def rag_agent(question: str, verbose: bool = True) -> str:
     answer = response.text
 
     if verbose:
-        print(f"🤖 Answer: {answer}")
-        print(f"{'═' * 60}\n")
+        print(f"[>] Answer: {answer}")
+        print(f"{'=' * 60}\n")
 
     return answer
 
 
 if __name__ == "__main__":
-    # Quick test query
     print("Testing query module...")
     ask_rag("What is the work from home policy?", n_results=3)
