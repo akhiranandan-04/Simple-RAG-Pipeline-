@@ -83,6 +83,7 @@ RAG PIPELINE BASIC/
 ├── .env.example                  # Environment variables template
 ├── .env                          # Local environment variables file (contains GEMINI_API_KEY)
 ├── .gitignore                    # Git ignore rules for secrets and venv
+├── Dockerfile                    # Container configuration file for Docker / Render deployment
 │
 ├── ingest.py                     # Document loader & ChromaDB ingestion pipeline
 ├── query.py                      # Core retrieval engine, Standard RAG & Agentic RAG logic
@@ -103,6 +104,21 @@ When deploying this RAG application to cloud platforms such as **Render**, **Rai
 > [!IMPORTANT]
 > - **ChromaDB Web UI (`streamlit_app.py`)**: Uses dense vector embeddings via SentenceTransformers (`all-MiniLM-L6-v2`) and ChromaDB. It requires **~300MB+ RAM** to load the model into memory. On free tier cloud instances (e.g. Render 512MB RAM), storage/RAM limits can trigger out-of-memory (OOM) crash loops. **Use a Paid RAM Instance on Render** if you want to deploy the ChromaDB version in production.
 > - **Lightweight TF-IDF Web UI (`streamlit_app_tfidf.py`)**: Replaces ChromaDB with scikit-learn's TF-IDF vector search. It requires zero external model downloads, consumes **< 10MB RAM**, and starts instantly. **Recommended for Render Free Tier Deployment**.
+
+---
+
+## 🐳 Docker Deployment
+
+You can build and run the container locally or deploy it to Render Web Services via Docker:
+
+```bash
+# Build Docker Image
+docker build -t rag-streamlit-app .
+
+# Run Container (with GEMINI_API_KEY environment variable)
+docker run -p 10000:10000 -e GEMINI_API_KEY="your_gemini_api_key_here" rag-streamlit-app
+```
+Access the application at `http://localhost:10000`.
 
 ---
 
