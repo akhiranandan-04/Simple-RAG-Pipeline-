@@ -87,6 +87,8 @@ RAG PIPELINE BASIC/
 ├── ingest.py                     # Document loader & ChromaDB ingestion pipeline
 ├── query.py                      # Core retrieval engine, Standard RAG & Agentic RAG logic
 ├── app.py                        # Interactive CLI query application
+├── streamlit_app.py              # Streamlit Web UI (ChromaDB Vector Search)
+├── streamlit_app_tfidf.py        # Streamlit Web UI (Lightweight TF-IDF Search for Free Cloud Deployment)
 ├── evaluate.py                   # Automated benchmark evaluation suite
 ├── requirements.txt              # Project dependencies list
 └── RAG_pipeline_from_scratch.ipynb  # Initial step-by-step notebook prototype
@@ -94,39 +96,13 @@ RAG PIPELINE BASIC/
 
 ---
 
-## ⚙️ Installation & Quickstart
+## ☁️ Cloud Deployment & Memory Guidelines (Render / Cloud Hosting)
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/akhiranandan-04/Simple-RAG-Pipeline-.git
-cd Simple-RAG-Pipeline-
-```
+When deploying this RAG application to cloud platforms such as **Render**, **Railway**, or **Hugging Face**:
 
-### 2. Create & Activate Virtual Environment
-```bash
-# Windows
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-
-# Linux / macOS
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configure API Keys
-Copy `.env.example` to `.env` and set your Google Gemini API key:
-```bash
-cp .env.example .env
-```
-Edit `.env`:
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-```
+> [!IMPORTANT]
+> - **ChromaDB Web UI (`streamlit_app.py`)**: Uses dense vector embeddings via SentenceTransformers (`all-MiniLM-L6-v2`) and ChromaDB. It requires **~300MB+ RAM** to load the model into memory. On free tier cloud instances (e.g. Render 512MB RAM), storage/RAM limits can trigger out-of-memory (OOM) crash loops. **Use a Paid RAM Instance on Render** if you want to deploy the ChromaDB version in production.
+> - **Lightweight TF-IDF Web UI (`streamlit_app_tfidf.py`)**: Replaces ChromaDB with scikit-learn's TF-IDF vector search. It requires zero external model downloads, consumes **< 10MB RAM**, and starts instantly. **Recommended for Render Free Tier Deployment**.
 
 ---
 
@@ -137,7 +113,16 @@ GEMINI_API_KEY=your_gemini_api_key_here
 python ingest.py
 ```
 
-### 2. Run Interactive CLI App
+### 2. Run Interactive Streamlit Web UI
+```bash
+# Option A: ChromaDB Semantic Search (Local / Paid Cloud Instances)
+streamlit run streamlit_app.py
+
+# Option B: Lightweight TF-IDF Search (Render Free Tier Deployment)
+streamlit run streamlit_app_tfidf.py
+```
+
+### 3. Run Interactive CLI App
 ```bash
 python app.py
 ```
@@ -150,7 +135,7 @@ python app.py -q "What is the work from home policy?"
 python app.py -a -q "How many sick leave days do I get per year?"
 ```
 
-### 3. Run Automated Evaluation Suite
+### 4. Run Automated Evaluation Suite
 ```bash
 python evaluate.py
 ```
